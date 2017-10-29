@@ -1,0 +1,181 @@
+#include<stdio.h>
+#include<string.h>
+#include<ctype.h>
+
+char matrix[5][5] ;
+int alphabets[26];
+int alphabetsJ[26];
+
+void calculateMatrix(char tempKey[])
+{
+	for(int i = 0; tempKey[i]; i++){
+  		tempKey[i] = tolower(tempKey[i]);
+	}
+	
+	for (int i = 0; i < 26; ++i)
+	{
+		alphabets[i] = -1;
+	}
+
+	char key[51];
+	strcpy(key, tempKey);
+
+	int len = strlen(tempKey) - 1 ;
+	char c = 'a';
+	for (int i = len; i < len + 26; ++i)
+	{
+		key[i] = c++; 
+	}
+
+	int i=0, j=0;
+	int count = 0;
+	int k = 0;
+
+	while(count < 25)
+	{
+		int c = key[k] - 97;
+
+		if (alphabets[c] == -1)
+		{
+			if (c == 8)
+			{
+				alphabets[9] = i;
+				alphabetsJ[9] = j;
+			}
+			if (c == 9)
+			{
+				alphabets[8] = i;
+				alphabetsJ[8] = j;
+			}
+			alphabets[c] = i;
+			alphabetsJ[c] = j;
+			matrix[i][j] = key[k];
+			if (j<4)
+			{
+				j++;
+			} 
+			else 
+			{
+				j = 0;
+				i++;
+			}
+			count++;
+		}
+		k++;
+	}
+
+/*	for (int x = 0; x < 5; ++x)
+	{
+		for (int y = 0; y < 5; ++y)
+		{
+			printf("%c\t", matrix[x][y]);
+		}
+		printf("\n");
+	}
+
+	for (int i = 0; i < 26; ++i)
+	{
+		printf("%d %d\n", alphabets[i], alphabetsJ[i]);
+	}*/
+}
+
+int main(int argc, char const *argv[])
+{
+	char tempKey[25];
+	printf("Key: ");
+	fgets(tempKey, 25, stdin);
+
+	calculateMatrix(tempKey);
+
+	char text[20];
+	printf("Text: ");
+	fgets(text, 25, stdin);
+
+	int len = strlen(text) - 1;
+	char pt[40];
+	int k = 0;
+	for (int i = 0; i < len; ++i)
+	{
+		pt[k++] = text[i];
+		if (i + 1 < len && text[i] == text[i+1])
+		{
+			pt[k++] = 'x';
+		}
+	}
+	len = strlen(pt);
+	if (len % 2 == 1)
+	{
+		pt[k] = 'x';
+	}
+	len = strlen(pt);
+	printf("%s\n", pt);
+
+	char ct[40];
+	for (int i = 0; i < len; i+=2)
+	{
+		char c1 = pt[i] - 97;
+		char c2 = pt[i+1] - 97;
+
+		int c1i = alphabets[c1];
+		int c2i = alphabets[c2];
+		int c1j = alphabetsJ[c1];
+		int c2j = alphabetsJ[c2];
+
+		//check if in same row
+		if (c1i == c2i)
+		{
+			c1j++;
+			c2j++;
+			printf("Same row\n");
+			if (c1j > 4)
+			{
+				ct[i] = matrix[c1i][0];
+			}
+			else
+			{
+				ct[i] = matrix[c1i][c1j];
+			}
+
+			if (c2j > 4)
+			{
+				ct[i+1] = matrix[c2i][0];
+			}
+			else
+			{
+				ct[i+1] = matrix[c2i][c2j];
+			}
+		}
+		else if (c1j == c2j)
+		{
+			printf("Same column\n");
+			c1i++;
+			c2i++;
+			if (c1i > 4)
+			{
+				ct[i] = matrix[0][c1j];
+			}
+			else
+			{
+				ct[i] = matrix[c1i][c1j];
+			}
+
+			if (c2j > 4)
+			{
+				ct[i+1] = matrix[0][c2j];
+			}
+			else
+			{
+				ct[i+1] = matrix[c2i][c2j];
+			}
+		}
+		else
+		{
+			printf("else\n");
+			ct[i] = matrix[c1i][c2j];
+			ct[i+1] = matrix[c2i][c1j];
+		}
+	}
+
+	printf("Cypher text: %s\n", ct);
+	return 0;
+}
